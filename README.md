@@ -1,87 +1,126 @@
-# Abercrombie AEM Developer Skill Assessment
+# Sample AEM project template
 
-## Pre Steps (**Your Assessment will not considered or reviewed if below steps are not followed**)
+This is a project template for AEM-based applications. It is intended as a best-practice set of examples as well as a potential starting point to develop your own functionality.
 
-1. Fork the repo using the git fork option to your personal repo.
-2. Create a new branch on your repo.
-3. **Do Not Create PR to Anf repo. Your code will not be considered**
-3. Complete exercises below by creating/modifying code. You can architect the project how you like re: folder structure, how you name your files, etc. Please add comments at the start and end of the code (i.e. `***Begin Code - Candidate Name***` and `***END Code*****`). Use your best judgement as a developer.
-3. **Push the code onto the new branch to your own public Git repository, and send the link to your recruiter / rep. Do not create PR to this repo**
-4. Pretend your code is going into a `PRODUCTION` environment, or that you are writing a pull request for an established open source project. Do not rush these exercises or cut corners in the name of speed. We aren't interested in the code you can write under pressure; no one writes amazing code when they are rushing. This is your chance to show off. Write your best code.
-5. This exercise is to be completed without coaching or other outside assistance. Obviously, you may feel free to use whatever online resources you like -- `StackOverflow` etc. -- but it is not acceptable to utilize other developers to help you finish this task.
+## Modules
 
+The main parts of the template are:
 
-## Exercise 1: Saving data into JCR
+* core: Java bundle containing all core functionality like OSGi services, listeners or schedulers, as well as component-related Java code such as servlets or request filters.
+* it.tests: Java based integration tests
+* ui.apps: contains the /apps (and /etc) parts of the project, ie JS&CSS clientlibs, components, and templates
+* ui.content: contains sample content using the components from the ui.apps
+* ui.config: contains runmode specific OSGi configs for the project
+* ui.frontend: an optional dedicated front-end build mechanism (Angular, React or general Webpack project)
+* ui.tests: Selenium based UI tests
+* all: a single content package that embeds all of the compiled modules (bundles and content packages) including any vendor dependencies
+* analyse: this module runs analysis on the project which provides additional validation for deploying into AEMaaCS
 
-Create a form (re-using OOB component where possible) which has the following fields: First Name, Last Name, Age, Country and a Submit button.  Create a `JS clientlib` for your component and write a validation logic on submit. For validation, fetch the min and max age data from the node `/etc/age`. If the user entered age lies in between the min and max value, all the user details will be saved inside JCR (under `/var/anf-code-challenge`) otherwise, an error message will be displayed with following text `You are not eligible`.
+## How to build
 
-<div style="width:400px">
+To build all the modules run in the project root directory the following command with Maven 3:
 
-![](images/Exercise-1.png)
-</div>
+    mvn clean install
 
-### Acceptance Criteria:
-1. Fetch node details from /etc/age having properties: `minAge` and `maxAge`.
-2. When submit button is clicked, validate the age and save the user details on a node under `/var/anf-code-challenge` after successful validation.
-3. Populate the dialog dropdown (country component) dynamically using `JSON` in DAM (JSON Path: `/content/dam/anf-code-challenge/exercise-1/countries.json`) and display the selected country on the page.
+To build all the modules and deploy the `all` package to a local instance of AEM, run in the project root directory the following command:
 
-### Notes:
-1. Please refer to `exercises/Exercise-1` folder and deploy `Exercise-1.zip` onto your `AEM 6.5.0`
-2. Call `UserServlet.java` from your clientlib JS to perform the required validations.
+    mvn clean install -PautoInstallSinglePackage
 
+Or to deploy it to a publish instance, run
 
-## Exercise 2: News Feed Component
+    mvn clean install -PautoInstallSinglePackagePublish
 
-Every news feed item displays the following attributes:
-1.	Title
-2.	Author
-3.	Current date
-4.	Text/Description
-5.	Image
+Or alternatively
 
-<div style="width:400px">
+    mvn clean install -PautoInstallSinglePackage -Daem.port=4503
 
-![](images/Exercise-2_1.png)
-</div>
+Or to deploy only the bundle to the author, run
 
-### Node structure:
+    mvn clean install -PautoInstallBundle
 
-<div style="width:500px">
+Or to deploy only a single content package, run in the sub-module directory (i.e `ui.apps`)
 
-![](images/Exercise-2_2.png)
-</div>
+    mvn clean install -PautoInstallPackage
 
-### Acceptance Criteria:
+## Testing
 
-1.	Create news feed component following Adobe’s best practices.
-2.	Read the news data under `/var/commerce/products/anf-code-challenge/newsData` and display it in the component.
-3.	Write Unit test cases (using any unit-tests library) for the back-end code with at least `80% coverage` and commit the coverage report.
+There are three levels of testing contained in the project:
 
-### Notes:
-1. Please refer to `exercises/Exercise-2` folder and deploy `Exercise-2.zip` onto your `AEM 6.5.0`
+### Unit tests
 
+This show-cases classic unit testing of the code contained in the bundle. To
+test, execute:
 
-## Exercise 3: Query JCR
+    mvn clean test
 
-Fetch the first 10 pages under the path `/content/anf-code-challenge/us/en`  where property `anfCodeChallenge` exists under the page node.
+### Integration tests
 
-<div style="width:500px">
+This allows running integration tests that exercise the capabilities of AEM via
+HTTP calls to its API. To run the integration tests, run:
 
-![](images/Exercise-3.png)
-</div>
+    mvn clean verify -Plocal
 
-### Acceptance Criteria:
-1. Fetch the first 10 pages using any two: `XPath`, `JCR-SQL2`, or `the Query Builder API`.
-2. Follow Adobe's best practices for better performance.
+Test classes must be saved in the `src/main/java` directory (or any of its
+subdirectories), and must be contained in files matching the pattern `*IT.java`.
 
-### Notes:
-1. Please refer to `exercises/Exercise-3` folder and deploy `Exercise-3.zip` onto your `AEM 6.5.0`
+The configuration provides sensible defaults for a typical local installation of
+AEM. If you want to point the integration tests to different AEM author and
+publish instances, you can use the following system properties via Maven's `-D`
+flag.
 
+| Property | Description | Default value |
+| --- | --- | --- |
+| `it.author.url` | URL of the author instance | `http://localhost:4502` |
+| `it.author.user` | Admin user for the author instance | `admin` |
+| `it.author.password` | Password of the admin user for the author instance | `admin` |
+| `it.publish.url` | URL of the publish instance | `http://localhost:4503` |
+| `it.publish.user` | Admin user for the publish instance | `admin` |
+| `it.publish.password` | Password of the admin user for the publish instance | `admin` |
 
-## Exercise 4: Saving a property on page creation
+The integration tests in this archetype use the [AEM Testing
+Clients](https://github.com/adobe/aem-testing-clients) and showcase some
+recommended [best
+practices](https://github.com/adobe/aem-testing-clients/wiki/Best-practices) to
+be put in use when writing integration tests for AEM.
 
-Use your best knowledge to choose among any of the eventing mechanisms available in AEM to write in to the JCR whenever a new page is created under `/content/anf-code-challenge/us/en`
+## Static Analysis
 
-### Acceptance Criteria:
-1. Create a page under `/content/anf-code-challenge/us/en`.
-2. As soon as the page is created, a property `pageCreated: {Boolean}true` should be saved on it.
+The `analyse` module performs static analysis on the project for deploying into AEMaaCS. It is automatically
+run when executing
+
+    mvn clean install
+
+from the project root directory. Additional information about this analysis and how to further configure it
+can be found here https://github.com/adobe/aemanalyser-maven-plugin
+
+### UI tests
+
+They will test the UI layer of your AEM application using Selenium technology. 
+
+To run them locally:
+
+    mvn clean verify -Pui-tests-local-execution
+
+This default command requires:
+* an AEM author instance available at http://localhost:4502 (with the whole project built and deployed on it, see `How to build` section above)
+* Chrome browser installed at default location
+
+Check README file in `ui.tests` module for more details.
+
+## ClientLibs
+
+The frontend module is made available using an [AEM ClientLib](https://helpx.adobe.com/experience-manager/6-5/sites/developing/using/clientlibs.html). When executing the NPM build script, the app is built and the [`aem-clientlib-generator`](https://github.com/wcm-io-frontend/aem-clientlib-generator) package takes the resulting build output and transforms it into such a ClientLib.
+
+A ClientLib will consist of the following files and directories:
+
+- `css/`: CSS files which can be requested in the HTML
+- `css.txt` (tells AEM the order and names of files in `css/` so they can be merged)
+- `js/`: JavaScript files which can be requested in the HTML
+- `js.txt` (tells AEM the order and names of files in `js/` so they can be merged
+- `resources/`: Source maps, non-entrypoint code chunks (resulting from code splitting), static assets (e.g. icons), etc.
+
+## Maven settings
+
+The project comes with the auto-public repository configured. To setup the repository in your Maven settings, refer to:
+
+    http://helpx.adobe.com/experience-manager/kb/SetUpTheAdobeMavenRepository.html

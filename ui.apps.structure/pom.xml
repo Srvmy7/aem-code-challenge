@@ -6,18 +6,18 @@
     <!-- P A R E N T  P R O J E C T  D E S C R I P T I O N                      -->
     <!-- ====================================================================== -->
     <parent>
-        <groupId>com.anf</groupId>
-        <artifactId>anf-code-challenge</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>com.geeks.aem.tutorials</groupId>
+        <artifactId>geekstutorials</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <!-- ====================================================================== -->
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
-    <artifactId>anf-code-challenge.ui.apps.structure</artifactId>
+    <artifactId>geekstutorials.ui.apps.structure</artifactId>
     <packaging>content-package</packaging>
-    <name>ANF Code Challenge - Repository Structure Package</name>
+    <name>Geeks Tutorials - Repository Structure Package</name>
     <description>
         Empty package that defines the structure of the Adobe Experience Manager repository the Code packages in this project deploy into.
         Any roots in the Code packages of this project should have their parent enumerated in the Filters list below.
@@ -28,15 +28,12 @@
             <plugin>
                 <groupId>org.apache.jackrabbit</groupId>
                 <artifactId>filevault-package-maven-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
-                    <properties>
-                        <cloudManagerTarget>none</cloudManagerTarget>
-                    </properties>
                     <filters>
 
                         <!-- /apps root -->
                         <filter><root>/apps</root></filter>
+                        <filter><root>/apps/geekstutorials</root></filter>
 
                         <!-- Common overlay roots -->
                         <filter><root>/apps/sling</root></filter>
