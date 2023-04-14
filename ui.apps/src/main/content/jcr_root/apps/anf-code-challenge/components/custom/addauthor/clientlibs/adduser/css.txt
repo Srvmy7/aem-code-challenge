@@ -1,2 +1,0 @@
-#base=css
-bootstrap-tagsinput.css

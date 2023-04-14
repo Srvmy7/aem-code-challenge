@@ -1,2 +1,0 @@
-#base=css
-dataTables-bootstrap.css
